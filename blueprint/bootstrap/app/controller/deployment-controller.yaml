@@ -4,6 +4,7 @@ metadata:
   annotations: {}
   creationTimestamp: null
   name: bootstrap-controller
+  namespace: nephio-system
 spec:
   replicas: 1
   selector:
@@ -22,6 +23,7 @@ spec:
         app.kubernetes.io/version: tbd
         fn.kptgen.dev/controller: bootstrap-controller
       name: bootstrap-controller
+      namespace: nephio-system
     spec:
       containers:
       - args:
