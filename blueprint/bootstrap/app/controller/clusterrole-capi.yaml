@@ -18,3 +18,5 @@ rules:
   - clusters
   verbs:
   - get
+  - list
+  - watch

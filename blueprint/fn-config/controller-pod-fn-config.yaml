@@ -23,7 +23,7 @@ spec:
       permissions:
       - apiGroups: [cluster.x-k8s.io]
         resources: [clusters]
-        verbs: [get]
+        verbs: [get, list, watch]
     porch:
       scope: cluster
       permissions:
