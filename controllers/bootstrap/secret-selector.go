@@ -19,10 +19,7 @@ package bootstrap
 import (
 	"strings"
 
-	"github.com/henderiw-nephio/bootstrap-controller/pkg/applicator"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/client-go/tools/clientcmd"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type ClusterType string
@@ -40,18 +37,4 @@ func getClusterType(secret *corev1.Secret) ClusterType {
 		}
 	}
 	return ClusterTypeNoKubeConfig
-}
-
-func getCapiClusterClient(secret *corev1.Secret) (applicator.APIPatchingApplicator, error) {
-	//provide a restconfig from the secret value
-	config, err := clientcmd.RESTConfigFromKubeConfig(secret.Data["value"])
-	if err != nil {
-		return applicator.APIPatchingApplicator{}, err
-	}
-	// build a cluster client from the kube rest config
-	clClient, err := client.New(config, client.Options{})
-	if err != nil {
-		return applicator.APIPatchingApplicator{}, err
-	}
-	return applicator.NewAPIPatchingApplicator(clClient), nil
 }

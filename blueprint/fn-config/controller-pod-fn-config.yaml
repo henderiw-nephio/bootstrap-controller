@@ -18,6 +18,12 @@ spec:
       - apiGroups: ["coordination.k8s.io"]
         resources: [leases]
         verbs: [get, list, watch, update, patch, create, delete]
+    capi:
+      scope: cluster
+      permissions:
+      - apiGroups: [cluster.x-k8s.io]
+        resources: [clusters]
+        verbs: [get]
     porch:
       scope: cluster
       permissions:
