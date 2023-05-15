@@ -87,6 +87,7 @@ func (r *reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		switch clusterType {
 		case ClusterTypeCapi:
 			if !r.isCapiClusterReady(ctx, secret) {
+				r.l.Info("cluster not ready")
 				return ctrl.Result{RequeueAfter: 10 * time.Second}, nil
 			}
 			// err is handled generically for all cluster types
