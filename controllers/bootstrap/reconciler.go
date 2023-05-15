@@ -19,6 +19,7 @@ package bootstrap
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/go-logr/logr"
 	ctrlconfig "github.com/henderiw-nephio/bootstrap-controller/controllers/config"
@@ -62,7 +63,7 @@ type reconciler struct {
 
 func (r *reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	r.l = log.FromContext(ctx)
-	r.l.Info("reconcile", "req", req)
+	//r.l.Info("reconcile", "req", req)
 
 	//cluster := &capiv1beta1.Cluster{}
 	secret := &corev1.Secret{}
@@ -72,6 +73,10 @@ func (r *reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 			r.l.Error(err, "cannot get resource")
 			return ctrl.Result{}, errors.Wrap(resource.IgnoreNotFound(err), "cannot get resource")
 		}
+		return reconcile.Result{}, nil
+	}
+
+	if secret.DeletionTimestamp != nil {
 		return reconcile.Result{}, nil
 	}
 
@@ -86,19 +91,25 @@ func (r *reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 		if err != nil {
 			msg := fmt.Sprintf("cannot get client clusterType: %s", clusterType)
 			r.l.Error(err, msg)
-			return ctrl.Result{}, errors.Wrap(err, msg)
+			return ctrl.Result{RequeueAfter: 30 * time.Second}, errors.Wrap(err, msg)
 		}
 
 		pods := &corev1.PodList{}
 		if err = clusterClient.List(ctx, pods); err != nil {
 			msg := "cannot get Pod List"
 			r.l.Error(err, msg)
-			return ctrl.Result{}, errors.Wrap(err, msg)
+			return ctrl.Result{RequeueAfter: 30 * time.Second}, errors.Wrap(err, msg)
 		}
 
-		for _, pod := range pods.Items {
-			r.l.Info("pod", "cluster", req.NamespacedName, "pod", pod)
+		r.l.Info("pod", "cluster", req.NamespacedName, "items", len(pods.Items))
+		if len(pods.Items) == 0 {
+			return ctrl.Result{RequeueAfter: 30 * time.Second}, nil
 		}
+		/*
+			for _, pod := range pods.Items {
+				r.l.Info("pod", "cluster", req.NamespacedName, "pod", pod.GetName())
+			}
+		*/
 	}
 
 	//r.l.Info("done", "clusterNotReady", clusterNotReady)
