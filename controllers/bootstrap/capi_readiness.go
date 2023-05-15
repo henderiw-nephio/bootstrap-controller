@@ -38,7 +38,7 @@ func (r *reconciler) isCapiClusterReady(ctx context.Context, secret *corev1.Secr
 	return isReady(cluster.GetConditions())
 }
 
-func  getCapiClusterClient(secret *corev1.Secret) (applicator.APIPatchingApplicator, error) {	
+func getCapiClusterClient(secret *corev1.Secret) (applicator.APIPatchingApplicator, error) {
 	//provide a restconfig from the secret value
 	config, err := clientcmd.RESTConfigFromKubeConfig(secret.Data["value"])
 	if err != nil {
